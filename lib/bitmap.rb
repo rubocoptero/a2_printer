@@ -8,27 +8,6 @@ class Bitmap
       new(width, height, source)
     end
 
-    def self.obtain_data source
-      if source.respond_to?(:getbyte)
-        data = source
-      else
-        data = StringIO.new(source.map(&:chr).join)
-      end
-      data
-    end
-
-    def self.obtain_height data
-      tmp = data.getbyte
-      height = (data.getbyte << 8) + tmp
-      height
-    end
-
-    def self.obtain_width data
-      tmp = data.getbyte
-      width = (data.getbyte << 8) + tmp
-      width
-    end
-
     def initialize(width, height, source)
         set_source(source)
         @width = width
@@ -61,5 +40,26 @@ class Bitmap
       else
         @data = StringIO.new(source.map(&:chr).join)
       end
+    end
+
+    def self.obtain_data source
+      if source.respond_to?(:getbyte)
+        data = source
+      else
+        data = StringIO.new(source.map(&:chr).join)
+      end
+      data
+    end
+
+    def self.obtain_height data
+      tmp = data.getbyte
+      height = (data.getbyte << 8) + tmp
+      height
+    end
+
+    def self.obtain_width data
+      tmp = data.getbyte
+      width = (data.getbyte << 8) + tmp
+      width
     end
   end

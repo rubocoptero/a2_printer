@@ -1,3 +1,5 @@
+require "chunk"
+
 class Bitmap
     attr_reader :width, :height
 
@@ -28,7 +30,7 @@ class Bitmap
         row_start += MAX_CHUNK_HEIGHT
       end
     end
-    
+
     private
 
     def printChunk(connection, row_start, width_in_bytes)

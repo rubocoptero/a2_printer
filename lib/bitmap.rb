@@ -4,7 +4,7 @@ class Bitmap
     def self.from_source source
       data = obtain_data source
       width = obtain_width data
-      height = obtain_heigth data
+      height = obtain_height data
       new(width, height, source)
     end
 
@@ -17,7 +17,7 @@ class Bitmap
       data
     end
 
-    def self.obtain_heigth data
+    def self.obtain_height data
       tmp = data.getbyte
       height = (data.getbyte << 8) + tmp
       height
@@ -61,12 +61,5 @@ class Bitmap
       else
         @data = StringIO.new(source.map(&:chr).join)
       end
-    end
-
-    def extract_width_and_height_from_data
-      tmp = @data.getbyte
-      @width = (@data.getbyte << 8) + tmp
-      tmp = @data.getbyte
-      @height = (@data.getbyte << 8) + tmp
     end
   end

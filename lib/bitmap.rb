@@ -1,6 +1,8 @@
 class Bitmap
     attr_reader :width, :height
 
+    MAX_CHUNK_HEIGHT = 255
+
     def self.from_source source
       data = obtain_data source
       width = obtain_width data
@@ -22,17 +24,33 @@ class Bitmap
       row_start = 0
       width_in_bytes = width / 8
       while row_start < height do
-        chunk_height = ((height - row_start) > 255) ? 255 : (height - row_start)
-        bytes = (0...(width_in_bytes * chunk_height)).map { @data.getbyte }
-
-        connection.write_bytes(18, 42)
-        connection.write_bytes(chunk_height, width_in_bytes)
-        connection.write_bytes(*bytes)
-        row_start += 255
+        printChunk(connection, row_start, width_in_bytes)
+        row_start += MAX_CHUNK_HEIGHT
       end
     end
-
+    
     private
+
+    def printChunk(connection, row_start, width_in_bytes)
+      chunk_height = getChunkHeight(row_start)
+      bytes = getChunkBytes(chunk_height, width_in_bytes)
+
+      printChunkBytes(bytes, chunk_height, connection, width_in_bytes)
+    end
+
+    def printChunkBytes(bytes, chunk_height, connection, width_in_bytes)
+      connection.write_bytes(18, 42)
+      connection.write_bytes(chunk_height, width_in_bytes)
+      connection.write_bytes(*bytes)
+    end
+
+    def getChunkBytes(chunk_height, width_in_bytes)
+      (0...(width_in_bytes * chunk_height)).map { @data.getbyte }
+    end
+
+    def getChunkHeight(row_start)
+      ((height - row_start) > MAX_CHUNK_HEIGHT) ? MAX_CHUNK_HEIGHT : (height - row_start)
+    end
 
     def set_data(source)
       @data = self.class.obtain_data source

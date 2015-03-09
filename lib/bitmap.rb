@@ -3,8 +3,6 @@ require "chunk"
 class Bitmap
     attr_reader :width, :height
 
-    MAX_CHUNK_HEIGHT = 255
-
     def self.from_source source
       data = obtain_data source
       width = obtain_width data
@@ -26,15 +24,19 @@ class Bitmap
       row_start = 0
 
       while row_start < height do
-        chunk_height = getNextChunkHeight(row_start)
-        chunk = Chunk.new(@width, chunk_height, @data)
-        chunk.print connection
+        print_chunk_starting_from(connection, row_start)
 
         row_start += Chunk::MAX_HEIGHT
       end
     end
 
     private
+
+    def print_chunk_starting_from(connection, row_start)
+      chunk_height = getNextChunkHeight(row_start)
+      chunk = Chunk.new(@width, chunk_height, @data)
+      chunk.print connection
+    end
 
     def getNextChunkHeight(row_start)
       ((height - row_start) > Chunk::MAX_HEIGHT) ? Chunk::MAX_HEIGHT : (height - row_start)

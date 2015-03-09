@@ -10,12 +10,16 @@ class Chunk
   def print connection
     bytes = getBytes()
 
+    write_bytes(connection, bytes)
+  end
+
+  private
+
+  def write_bytes(connection, bytes)
     connection.write_bytes(18, 42)
     connection.write_bytes(@height, @width_in_bytes)
     connection.write_bytes(*bytes)
   end
-
-  private
 
   def getBytes()
     (0...(@width_in_bytes * @height)).map { @data.getbyte }

@@ -26,32 +26,23 @@ class Bitmap
       row_start = 0
       width_in_bytes = width / 8
       while row_start < height do
-        printChunk(connection, row_start, width_in_bytes)
-        row_start += MAX_CHUNK_HEIGHT
+        chunk_height = getChunkHeight(row_start)
+        bytes = getChunkBytes(chunk_height, width_in_bytes)
+        chunk = Chunk.new(@width, chunk_height, bytes)
+        chunk.print connection
+
+        row_start += Chunk::MAX_HEIGHT
       end
     end
 
     private
-
-    def printChunk(connection, row_start, width_in_bytes)
-      chunk_height = getChunkHeight(row_start)
-      bytes = getChunkBytes(chunk_height, width_in_bytes)
-
-      printChunkBytes(bytes, chunk_height, connection, width_in_bytes)
-    end
-
-    def printChunkBytes(bytes, chunk_height, connection, width_in_bytes)
-      connection.write_bytes(18, 42)
-      connection.write_bytes(chunk_height, width_in_bytes)
-      connection.write_bytes(*bytes)
-    end
 
     def getChunkBytes(chunk_height, width_in_bytes)
       (0...(width_in_bytes * chunk_height)).map { @data.getbyte }
     end
 
     def getChunkHeight(row_start)
-      ((height - row_start) > MAX_CHUNK_HEIGHT) ? MAX_CHUNK_HEIGHT : (height - row_start)
+      ((height - row_start) > Chunk::MAX_HEIGHT) ? Chunk::MAX_HEIGHT : (height - row_start)
     end
 
     def set_data(source)

@@ -24,11 +24,10 @@ class Bitmap
 
     def print connection
       row_start = 0
-      width_in_bytes = width / 8
+
       while row_start < height do
-        chunk_height = getChunkHeight(row_start)
-        bytes = getChunkBytes(chunk_height, width_in_bytes)
-        chunk = Chunk.new(@width, chunk_height, bytes)
+        chunk_height = getNextChunkHeight(row_start)
+        chunk = Chunk.new(@width, chunk_height, @data)
         chunk.print connection
 
         row_start += Chunk::MAX_HEIGHT
@@ -37,11 +36,7 @@ class Bitmap
 
     private
 
-    def getChunkBytes(chunk_height, width_in_bytes)
-      (0...(width_in_bytes * chunk_height)).map { @data.getbyte }
-    end
-
-    def getChunkHeight(row_start)
+    def getNextChunkHeight(row_start)
       ((height - row_start) > Chunk::MAX_HEIGHT) ? Chunk::MAX_HEIGHT : (height - row_start)
     end
 

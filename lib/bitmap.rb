@@ -1,30 +1,30 @@
 require "chunk"
 
 class Bitmap
-    attr_reader :width, :height
 
-    def self.from_source source
+    def self.from_source connection, source
       data = obtain_data source
       width = obtain_width data
       height = obtain_height data
-      new(width, height, source)
+      new(connection, width, height, source)
     end
 
-    def initialize(width, height, source)
+    def initialize(connection, width, height, source)
         set_data(source)
         @width = width
         @height = height
+        @connection =  connection
     end
 
     def wider_than? width
       @width > width
     end
 
-    def print connection
+    def print
       row_start = 0
 
-      while row_start < height do
-        print_chunk_starting_from(connection, row_start)
+      while row_start < @height do
+        print_chunk_starting_from(@connection, row_start)
 
         row_start += Chunk::MAX_HEIGHT
       end
@@ -33,13 +33,13 @@ class Bitmap
     private
 
     def print_chunk_starting_from(connection, row_start)
-      chunk_height = getNextChunkHeight(row_start)
+      chunk_height = calculate_next_chunk_height(row_start)
       chunk = Chunk.new(@width, chunk_height, @data)
-      chunk.print connection
+      chunk.print @connection
     end
 
-    def getNextChunkHeight(row_start)
-      ((height - row_start) > Chunk::MAX_HEIGHT) ? Chunk::MAX_HEIGHT : (height - row_start)
+    def calculate_next_chunk_height(row_start)
+      ((@height - row_start) > Chunk::MAX_HEIGHT) ? Chunk::MAX_HEIGHT : (@height - row_start)
     end
 
     def set_data(source)
@@ -56,14 +56,15 @@ class Bitmap
     end
 
     def self.obtain_height data
-      tmp = data.getbyte
-      height = (data.getbyte << 8) + tmp
-      height
+      obtain_parameter data
     end
 
     def self.obtain_width data
+      obtain_parameter data
+    end
+
+    def self.obtain_parameter data
       tmp = data.getbyte
-      width = (data.getbyte << 8) + tmp
-      width
+      (data.getbyte << 8) + tmp
     end
   end

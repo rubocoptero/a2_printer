@@ -39,7 +39,13 @@ class Bitmap
     end
 
     def calculate_next_chunk_height(row_start)
-      ((@height - row_start) > Chunk::MAX_HEIGHT) ? Chunk::MAX_HEIGHT : (@height - row_start)
+      chunk_height = @height - row_start
+      sanitize chunk_height
+    end
+
+    def sanitize height
+      return Chunk::MAX_HEIGHT if height > Chunk::MAX_HEIGHT
+      height
     end
 
     def set_data(source)
